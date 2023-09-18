@@ -1,29 +1,29 @@
 jobs:
-  - name: dataworks-repo-template-terraform-pr
+  - name: workflow-orchestration-poc-pr
     plan:
-      - get: dataworks-repo-template-terraform-pr
+      - get: workflow-orchestration-poc-pr
         trigger: true
         version: every
-      - put: dataworks-repo-template-terraform-pr
+      - put: workflow-orchestration-poc-pr
         params:
-          path: dataworks-repo-template-terraform-pr
+          path: workflow-orchestration-poc-pr
           status: pending
       - .: (( inject meta.plan.terraform-bootstrap ))
         input_mapping:
-          dataworks-repo-template-terraform: dataworks-repo-template-terraform-pr
+          workflow-orchestration-poc: workflow-orchestration-poc-pr
       - .: (( inject meta.plan.terraform-plan ))
         input_mapping:
-          dataworks-repo-template-terraform: dataworks-repo-template-terraform-pr
+          workflow-orchestration-poc: workflow-orchestration-poc-pr
         params:
           TF_WORKSPACE: "qa"
           DETAILED_EXITCODE: ""
         on_failure:
-          put: dataworks-repo-template-terraform-pr
+          put: workflow-orchestration-poc-pr
           params:
-            path: dataworks-repo-template-terraform-pr
+            path: workflow-orchestration-poc-pr
             status: failure
         on_success:
-          put: dataworks-repo-template-terraform-pr
+          put: workflow-orchestration-poc-pr
           params:
-            path: dataworks-repo-template-terraform-pr
+            path: workflow-orchestration-poc-pr
             status: success
