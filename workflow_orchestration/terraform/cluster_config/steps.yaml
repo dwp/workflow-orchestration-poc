@@ -4,5 +4,5 @@ Steps:
   HadoopJarStep:
     Args:
     - "sleep 5"
-    Jar: "s3://eu-west-2.elasticmapreduce/libs/script-runner/script-runner.jar"
+    Jar: "s3://us-east-1.elasticmapreduce/libs/script-runner/script-runner.jar"
   ActionOnFailure: "CONTINUE"
