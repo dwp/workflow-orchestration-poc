@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  localstack:
+    image: localstack/localstack-pro:latest
+    environment:
+      LS_LOG: trace
+      LOCALSTACK_API_KEY: ${LOCALSTACK_API_KEY}
+      SERVICES: serverless
+      LAMBDA_EXECUTOR: docker
+    ports:
+      - 4566:4566
+      - 4510-4559:4510-4559
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock

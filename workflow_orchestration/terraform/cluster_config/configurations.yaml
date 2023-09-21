@@ -1,0 +1,6 @@
+---
+Configurations:
+- Classification: "hive-site"
+  Properties:
+    "hive.metastore.schema.verification": "false"
+    "javax.jdo.option.ConnectionPassword": "connection-password"
