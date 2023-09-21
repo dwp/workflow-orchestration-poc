@@ -17,11 +17,7 @@ class TestInvoke(TestCase):
         print('\r\nTearing down the class')
         testutils.delete_lambda('workflow_orchestrator')
 
-    # def test_that_workflow_orchestrator_returns_correct_message(self):
-        # payload = testutils.invoke_function_and_get_message('workflow_orchestrator')
-        # self.assertEqual(payload['message'], 'Hello World!')
-
     def test_that_api_gateway_invokes_workflow_orchestrator(self):
-        # TODO: ERR is in testutils when it attempts to read the response from workflow orchestrator after calling emr launcher
+        # TODO: Assert we get back payload with Task ID
         resp = requests.post('http://workflow.localhost:4566/submit/emr_launcher')
         print(resp.content)
