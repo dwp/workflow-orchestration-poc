@@ -1,8 +1,8 @@
 import testutils
 import requests
-import time
 from unittest import TestCase
-
+import filter
+from tasks import EMRLauncher
 
 class TestInvoke(TestCase):
     
@@ -21,3 +21,13 @@ class TestInvoke(TestCase):
         # TODO: Assert we get back payload with Task ID
         resp = requests.post('http://workflow.localhost:4566/submit/emr_launcher')
         print(resp.content)
+
+    def test_task_filter_with_emr_launcher(self):
+        task_args = {
+            'launch_lambda': 'emr-launcher',
+            'overrides': {
+                'Name': 'local-cluster'
+            }
+        }
+        task = filter.task_constructor('emr_launcher', task_args)
+        assert self.assertTrue(isinstance(task, EMRLauncher))

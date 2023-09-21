@@ -1,21 +1,21 @@
 import logging
-import aws
-import json
+from submitter import TaskSubmitter
+from filter import task_constructor
+
 
 LOGGER = logging.getLogger()
 LOGGER.setLevel(logging.INFO)
 
-payload = {
+task_args = {
+    'launch_lambda': 'emr-launcher',
     'overrides': {
-        "Name": "new-cluster-name"
+        'Name': 'local-cluster'
     }
 }
 
 def handler(event, context):
     LOGGER.info('Workflow Orchestrator Invoked!')
-    resp = aws.invoke_lambda('emr-launcher', json.dumps(payload))
-    r = json.loads(resp['Payload'].read().decode('utf-8'))
-    return {
-        "ClusterId": r['JobFlowId'],
-        "ClusterArn": r['ClusterArn']
-    }
+    # resp = EMRLauncher('emr-launcher', payload).launch()
+    task = task_constructor('emr_launcher', task_args)
+    resp = TaskSubmitter(task)
+    return resp
