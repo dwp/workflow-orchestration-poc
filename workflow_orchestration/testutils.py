@@ -62,7 +62,7 @@ def wait_for_function(function_name):
     )
 
 
-def invoke_function_and_get_message(function_name) -> dict:
+def invoke_function_and_get_message(function_name):
     lambda_client = get_lambda_client()
     response = lambda_client.invoke(
         FunctionName=function_name,

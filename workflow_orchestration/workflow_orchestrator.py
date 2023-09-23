@@ -17,5 +17,5 @@ def handler(event, context):
     LOGGER.info('Workflow Orchestrator Invoked!')
     # resp = EMRLauncher('emr-launcher', payload).launch()
     task = task_constructor('emr_launcher', task_args)
-    resp = TaskSubmitter(task)
+    resp = TaskSubmitter(task).submit()
     return resp

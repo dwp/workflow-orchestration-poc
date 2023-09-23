@@ -1,7 +1,7 @@
-from tasks import EMRLauncher
+from tasks import Task, EMRLauncher
 
 
-def task_constructor(task_name: str, task_args: dict = {}):
+def task_constructor(task_name: str, task_args: dict = {}) -> Task:
 
     supported_tasks = {
         "emr_launcher": EMRLauncher

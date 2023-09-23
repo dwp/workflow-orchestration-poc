@@ -1,10 +1,11 @@
 import testutils
 import requests
+import uuid
 from unittest import TestCase
-import filter
-from tasks import EMRLauncher
+from filter import task_constructor
+from tasks import Task, EMRLauncher
 
-class TestInvoke(TestCase):
+class TestLambdaInvoke(TestCase):
     
     @classmethod
     def setUpClass(cls):
@@ -18,16 +19,45 @@ class TestInvoke(TestCase):
         testutils.delete_lambda('workflow_orchestrator')
 
     def test_that_api_gateway_invokes_workflow_orchestrator(self):
-        # TODO: Assert we get back payload with Task ID
         resp = requests.post('http://workflow.localhost:4566/submit/emr_launcher')
-        print(resp.content)
+        self.assertTrue(uuid.UUID(resp.text))
 
-    def test_task_filter_with_emr_launcher(self):
+    # def test_that_workflow_orchestrator_lambda_invokes(self):
+    #     # For some reason this test only work when ran standalone.
+    #     resp = testutils.invoke_function_and_get_message('workflow_orchestrator')
+    #     self.assertTrue(uuid.UUID(resp))
+
+
+
+class TestTask(TestCase):
+
+    def setUp(self):
+        self.task = Task()
+
+    def test_task_has_id(self):
+        task_id = self.task.task_id
+        self.assertIsNotNone(task_id)
+    
+    def test_task_has_start_time(self):
+        task_start_time = self.task.time_submitted
+        self.assertIsNotNone(task_start_time)
+
+    def test_task_has_initial_state(self):
+        task_state = self.task.state
+        self.assertEquals(task_state, "Submitted")
+
+
+class TestEMRLauncher(TestCase):
+
+    def setUp(self):
         task_args = {
             'launch_lambda': 'emr-launcher',
             'overrides': {
                 'Name': 'local-cluster'
             }
         }
-        task = filter.task_constructor('emr_launcher', task_args)
-        assert self.assertTrue(isinstance(task, EMRLauncher))
+        self.task = task_constructor('emr_launcher', task_args)
+        
+
+    def test_task_filter_with_emr_launcher(self):
+        assert type(self.task) is EMRLauncher

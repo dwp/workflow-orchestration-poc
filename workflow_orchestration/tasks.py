@@ -7,10 +7,10 @@ import aws
 class Task:
 
     def __init__(self, task_args: dict = {}) -> None:
-        task_id: str = uuid.uuid1()
-        time_submitted: str = datetime.now()
-        time_finished: str
-        state: str = "Submitted"
+        self.task_id: str = str(uuid.uuid1())
+        self.time_submitted: str = datetime.now()
+        self.time_finished: str
+        self.state: str = "Submitted"
         self.arguments: dict = task_args
 
     def start(self) -> None:
@@ -28,6 +28,8 @@ class EMRLauncher(Task):
         self.launcher_lambda = self.arguments['launch_lambda']
 
     def start(self) -> dict:
+        print(f'Payload: {self.arguments}')
+        del self.arguments['launch_lambda']
         resp = aws.invoke_lambda(self.launcher_lambda, json.dumps(self.arguments))
         r = json.loads(resp['Payload'].read().decode('utf-8'))
         return {
