@@ -1,0 +1,5 @@
+---
+Instances:
+  MasterInstanceType: m4.large
+  SlaveInstanceType: m4.large
+  InstanceCount: 1
