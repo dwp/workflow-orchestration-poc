@@ -15,7 +15,17 @@ task_args = {
 
 def handler(event, context):
     LOGGER.info('Workflow Orchestrator Invoked!')
-    # resp = EMRLauncher('emr-launcher', payload).launch()
-    task = task_constructor('emr_launcher', task_args)
-    resp = TaskSubmitter(task).submit()
+    command, task_name, extra_args = parse_path(event['path'])
+    task = task_constructor(task_name, task_args)
+    if command == "submit":
+        resp = TaskSubmitter(task).submit()
     return resp
+
+def parse_path(path: str):
+    request = path.split("/")
+    command = request[1]
+    task_name = request[2]
+    extra_args = None
+    if len(request) > 3:
+        extra_args = request[3:]
+    return (command, task_name, extra_args)

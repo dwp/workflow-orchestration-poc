@@ -4,6 +4,18 @@ import uuid
 from unittest import TestCase
 from filter import task_constructor
 from tasks import Task, EMRLauncher
+from workflow_orchestration import parse_path
+
+
+class TestParsePathTestCase(TestCase):
+
+    def test_parse_path_with_sumit_emr_launcher(self):
+        path = "/submit/emr_launcher"
+        command, task_name, extra_args = parse_path(path)
+        self.assertEqual(command, "submit")
+        self.assertEqual(task_name, "emr_launcher")
+        self.assertIsNone(extra_args)
+
 
 class TestLambdaInvoke(TestCase):
     

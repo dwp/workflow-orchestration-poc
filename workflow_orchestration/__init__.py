@@ -1,1 +1,1 @@
-from .workflow_orchestrator import handler
+from .workflow_orchestrator import handler, parse_path
