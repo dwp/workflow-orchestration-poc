@@ -32,7 +32,7 @@ def create_lambda_zip(directory):
 
 def create_lambda(function_name):
     lambda_client = get_lambda_client()
-    create_lambda_zip('workflow_orchestration')
+    create_lambda_zip('src')
     with open(LAMBDA_ZIP, 'rb') as f:
         zipped_code = f.read()
     lambda_client.create_function(

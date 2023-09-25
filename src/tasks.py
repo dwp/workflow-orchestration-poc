@@ -25,7 +25,7 @@ class EMRLauncher(Task):
 
     def __init__(self, task_args: dict):
         super().__init__(task_args)
-        self.launcher_lambda = self.arguments['launch_lambda']
+        self.launcher_lambda = self.arguments.get('launch_lambda')
 
     def start(self) -> dict:
         print(f'Payload: {self.arguments}')

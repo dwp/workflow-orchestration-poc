@@ -6,6 +6,9 @@ class TaskSubmitter:
     def __init__(self, task: Task) -> None:
         self.task = task
 
-    def submit(self) -> str:
+    def submit(self) -> dict:
         resp = self.task.start()
-        return self.task.task_id
+        return {
+            "task_id": self.task.task_id,
+            "task_detail": resp
+        }
