@@ -12,16 +12,24 @@ terraform {
 
   required_providers {
     aws = {
-      version = "4.53.0"
+      version = "5.18.1"
     }
   }
+}
+
+variable "assume_role" {
+  default = "ci"
+}
+
+variable "region" {
+  default = "eu-west-2"
 }
 
 provider "aws" {
   region  = "{{terraform.provider_region}}"
 
   default_tags {
-    tags = merge(local.common_repo_tags, {
+    tags = merge(local.tags, {
       Application      = "DataWorks"                              # As per our definition on ServiceNow
       Function         = "Data and Analytics"                     # As per our definition on ServiceNow
       Environment      = local.hcs_environment[local.environment] # Set up locals as per Tagging doc requirements https://engineering.dwp.gov.uk/policies/hcs-cloud-hosting-policies/resource-identification-tagging/
@@ -41,6 +49,20 @@ module "dataworks_common" {
   version               = "{{terraform.dataworks_common_module_version}}"
   tag_value_environment = local.environment
 }
+
+data "terraform_remote_state" "azkaban" {
+  backend = "s3"
+  workspace = terraform.workspace
+
+  config = {
+    bucket         = "{{terraform.state_file_bucket}}"
+    key            = "terraform/dataworks/aws-azkaban.tfstate"
+    region         = "{{terraform.state_file_region}}"
+    encrypt        = true
+    kms_key_id     = "arn:aws:kms:{{terraform.state_file_region}}:{{terraform.state_file_account}}:key/{{terraform.state_file_kms_key}}"
+    dynamodb_table = "remote_state_locks"
+  }
+} 
 
 locals {
   name        = "workflow-orchestration-poc"
@@ -87,7 +109,12 @@ locals {
     AutoShutdown = local.auto_shutdown_tag_value[local.environment]
   }
 
-  common_repo_tags = "${merge(module.dataworks_common.common_tags, local.overridden_tags)}"
+  tags = {
+  {% for key, value in common_tags.items() %}
+    {{key}} = "{{value}}"{% endfor %}
+    DWX_Environment  = local.environment
+    DWX_Application  = "aws-pdm-dataset-generation"
+  }
 
   cidr_block = {
   {%- for environment, ranges in cidr_block.items() %}
