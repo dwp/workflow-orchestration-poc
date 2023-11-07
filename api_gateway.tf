@@ -81,7 +81,7 @@ resource "aws_api_gateway_integration" "workflow_orchestrator_submit" {
   http_method             = aws_api_gateway_method.workflow_orchestrator_submit.http_method
   type                    = "AWS_PROXY"
   integration_http_method = "POST"
-  uri                     = aws_lambda_function.workflow_orchestrator.invoke_arn
+  uri                     = aws_lambda_function.workflow_orchestrator_task_submitter_lambda.invoke_arn
 }
 
 # /submit/{task_name}
@@ -108,7 +108,7 @@ resource "aws_api_gateway_integration" "workflow_orchestrator_task_name" {
   http_method             = aws_api_gateway_method.workflow_orchestrator_task_name.http_method
   type                    = "AWS_PROXY"
   integration_http_method = "POST"
-  uri                     = aws_lambda_function.workflow_orchestrator.invoke_arn
+  uri                     = aws_lambda_function.workflow_orchestrator_task_submitter_lambda.invoke_arn
 
   request_parameters = {
     "integration.request.path.id" = "method.request.path.task_name"

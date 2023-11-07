@@ -95,13 +95,13 @@ resource "aws_iam_role_policy_attachment" "lambda_vpc_deployment" {
   policy_arn = aws_iam_policy.lambda_vpc_deployment.arn
 }
 
-data "archive_file" "workflow_orchestrator_lambda" {
+data "archive_file" "workflow_orchestrator_task_submitter_lambda" {
   type        = "zip"
-  source_dir = "${path.module}/src/"
+  source_dir = "${path.module}/wo-task-submitter-lambda/"
   excludes = [
-    "${path.module}/src/test*"
+    "${path.module}/wo-task-submitter-lambda/test*"
   ]
-  output_path = "workflow_orchestrator.zip"
+  output_path = "workflow_orchestrator_task_submitter_lambda.zip"
 }
 
 resource "aws_security_group" "workflow_orchestrator" {
@@ -111,12 +111,12 @@ resource "aws_security_group" "workflow_orchestrator" {
   tags        = merge(local.tags, { Name = local.name })
 }
 
-resource "aws_lambda_function" "workflow_orchestrator" {
-    filename = "${path.module}/workflow_orchestrator.zip"
+resource "aws_lambda_function" "workflow_orchestrator_task_submitter_lambda" {
+    filename = "${path.module}/workflow_orchestrator_task_submitter_lambda.zip"
     function_name = "workflow_orchestrator"
     role = aws_iam_role.workflow_orchestrator.arn
-    handler = "workflow_orchestrator.handler"
-    source_code_hash = data.archive_file.workflow_orchestrator_lambda.output_base64sha256
+    handler = "handler.handler"
+    source_code_hash = data.archive_file.workflow_orchestrator_task_submitter_lambda.output_base64sha256
     runtime = "python3.11"
 
     vpc_config {
