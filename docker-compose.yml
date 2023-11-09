@@ -6,7 +6,7 @@ services:
     environment:
       LS_LOG: trace
       LOCALSTACK_API_KEY: ${LOCALSTACK_API_KEY}
-      SERVICES: serverless
+      SERVICES: serverless,lambda,events,iam,sns,cloudwatch
       LAMBDA_EXECUTOR: docker
     ports:
       - 4566:4566

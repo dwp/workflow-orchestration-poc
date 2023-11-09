@@ -1,6 +1,8 @@
-from unittest import TestCase
+import unittest
 import json
 
+import time
+import testutils
 from events import (
     UnsupportedEventType,
     EventEncoder,
@@ -9,7 +11,7 @@ from events import (
     filter_event_from_kwargs
 )
 
-class TestHappyDeserialiseEMRClusterEventTestCase(TestCase):
+class TestEMRClusterEventTestCase(unittest.TestCase):
 
     def setUp(self) -> None:
         self.test_event = """{
@@ -49,10 +51,10 @@ class TestHappyDeserialiseEMRClusterEventTestCase(TestCase):
 
 
     def test_event_json_dumps(self):
-        print(json.dumps(self.event, cls=EventEncoder))
+        print(self.event.to_json())
 
 
-class TestHappyDeserialiseEMRStepEventTestCase(TestCase):
+class TestEMRStepEventTestCase(unittest.TestCase):
 
     def setUp(self) -> None:
         self.test_event = """{
@@ -92,7 +94,7 @@ class TestHappyDeserialiseEMRStepEventTestCase(TestCase):
         self.assertIsInstance(self.event, EMRStepEvent)
 
 
-class TestUnhappyDeserialiseEventTestCase(TestCase):
+class TestUnsupportedEventTestCase(unittest.TestCase):
 
     def setUp(self) -> None:
         self.test_event = """{
@@ -118,3 +120,44 @@ class TestUnhappyDeserialiseEventTestCase(TestCase):
         json_object = json.loads(self.test_event)
         with self.assertRaises(UnsupportedEventType):
             filter_event_from_kwargs(**json_object)
+
+
+class TestCloudwatchEventTriggerLocalstackTestCase(unittest.TestCase):
+
+    def setUp(self) -> None:
+        print('\r\nSetting up the class')
+        function_arn = testutils.create_lambda('wo_task_listener')
+        testutils.wait_for_function('wo_task_listener')
+
+        sns_topic_arn = testutils.create_sns_topic('task_listener_topic')
+        event_bus_arn = testutils.create_event_bus('test-bus')
+        rule_arn = testutils.put_event_rule(
+            name="ClusterWaiting",
+            event_pattern="""{"source": ["aws.emr"], "detail-type": ["EMR Cluster State Change"], "detail": { "state": ["WAITING", "STARTING"] }}""",
+            event_bus=event_bus_arn
+        )
+        time.sleep(5)
+        testutils.put_event_targets(
+            rule=rule_arn,
+            targets=[
+                {
+                    "Id": "ClusterChange",
+                    "Arn": sns_topic_arn
+                }
+            ],
+            event_bus=event_bus_arn
+        )
+        testutils.subscribe_lambda_to_sns(
+            sns_topic_arn,
+            function_arn
+        )
+        self.cluster_id = testutils.create_emr_cluster()
+
+    def test_this(self):
+        print(self.cluster_id)
+        time.sleep(5)
+
+    def tearDown(self):
+        testutils.delete_lambda('wo_task_listener')
+        testutils.delete_event_bus('test-bus')
+        testutils.terminate_emr_cluster(self.cluster_id)

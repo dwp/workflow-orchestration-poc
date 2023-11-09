@@ -5,7 +5,7 @@ import json
 from unittest import TestCase
 from filter import task_constructor
 from tasks import Task, EMRLauncher
-from workflow_orchestrator import parse_request_path
+from handler import parse_request_path
 
 
 class TestParsePathTestCase(TestCase):

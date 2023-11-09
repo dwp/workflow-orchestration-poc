@@ -32,14 +32,14 @@ def create_lambda_zip(directory):
 
 def create_lambda(function_name):
     lambda_client = get_lambda_client()
-    create_lambda_zip('src')
+    create_lambda_zip('wo-task-submitter-lambda')
     with open(LAMBDA_ZIP, 'rb') as f:
         zipped_code = f.read()
     lambda_client.create_function(
         FunctionName=function_name,
         Runtime='python3.11',
         Role='arn:aws:iam::000000000000:role/lambda-role ',
-        Handler=function_name + '.handler',
+        Handler='handler.handler',
         Code=dict(ZipFile=zipped_code),
         Timeout=120
     )

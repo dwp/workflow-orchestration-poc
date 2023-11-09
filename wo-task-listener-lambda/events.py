@@ -27,6 +27,7 @@ def filter_event_from_kwargs(**kwargs):
 		return native_args
 
 	native_args = populate_cls_fields(cls_fields, kwargs.items())
+	native_args["event_type"] = cls.__name__
 
 	return cls(**native_args)
 
@@ -50,10 +51,14 @@ class EventEncoder(json.JSONEncoder):
 
 @dataclass
 class Event:
+	event_type: str
 	region: str
 	account: str
 	time: str
 	resources: list
+
+	def to_json(self):
+		return json.dumps(self, cls=EventEncoder)
 
 
 @dataclass

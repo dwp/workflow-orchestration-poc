@@ -113,7 +113,7 @@ resource "aws_security_group" "workflow_orchestrator" {
 
 resource "aws_lambda_function" "workflow_orchestrator_task_submitter_lambda" {
     filename = "${path.module}/workflow_orchestrator_task_submitter_lambda.zip"
-    function_name = "workflow_orchestrator"
+    function_name = "workflow_orchestrator_task_submitter"
     role = aws_iam_role.workflow_orchestrator.arn
     handler = "handler.handler"
     source_code_hash = data.archive_file.workflow_orchestrator_task_submitter_lambda.output_base64sha256
