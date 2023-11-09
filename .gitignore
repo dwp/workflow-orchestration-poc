@@ -12,3 +12,5 @@ aviator_pipeline.yml
 **/.vscode
 **/.venv
 **/*__pycache__
+
+**/*.zip

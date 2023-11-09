@@ -10,6 +10,7 @@ def handler(event, context):
     LOGGER.info("Workflow Orchestrator Task Listener Invoked!")
     event = filter_event_from_kwargs(**json.loads(event))
     try:
+        LOGGER.info(f"Constructed event: {event.to_json()}")
         resp = async_invoke_lambda("workflow_orchestration_task_submitter", event.to_json())
         payload = json.loads(resp["Payload"].read())
         rc = payload["statusCode"]
