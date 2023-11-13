@@ -7,10 +7,11 @@ LOGGER.setLevel(logging.INFO)
 def _get_resource(service: str):
     return boto3.client(service)
 
-def async_invoke_lambda(function_name: str, payload: bytes = None) -> dict:
-    c = _get_resource('lambda')
-    return c.invoke(
-        FunctionName=function_name,
-        InvocationType='Event',
-        Payload=payload
+def publish_to_sns(sns_topic_arn: str, message: str, group_id: str):
+    c = _get_resource('sns')
+    return c.publish(
+        TopicArn=sns_topic_arn,
+        Message=message,
+        MessageStructure='json',
+        MessageGroupId=group_id
     )

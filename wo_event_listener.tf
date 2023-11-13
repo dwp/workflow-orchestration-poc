@@ -46,6 +46,12 @@ resource "aws_lambda_function" "workflow_orchestrator_event_listener_lambda" {
         security_group_ids = [aws_security_group.workflow_orchestrator_event_listener.id]
         subnet_ids = data.aws_subnets.workflow_manager_private_subnets.ids
     }
+
+    environment {
+        variables = {
+          SNS_TOPIC_ARN = aws_sns_topic.workflow_orchestration_events_topic.arn
+        }
+    }
 }
 
 resource "aws_lambda_alias" "workflow_orchestration_event_listener_lambda_alias" {
@@ -54,4 +60,9 @@ resource "aws_lambda_alias" "workflow_orchestration_event_listener_lambda_alias"
 
     function_name = aws_lambda_function.workflow_orchestrator_event_listener_lambda.function_name
     function_version = "$LATEST"
+}
+
+resource "aws_sns_topic" "workflow_orchestration_events_topic" {
+    name = "workflow_orchestration_task_events.fifo"
+    fifo_topic = true
 }

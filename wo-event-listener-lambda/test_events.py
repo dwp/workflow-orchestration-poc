@@ -87,6 +87,7 @@ class TestEMRStepEventTestCase(unittest.TestCase):
         self.assertEqual(self.event.severity, "ERROR")
         self.assertEqual(self.event.name, "CustomJAR")
         self.assertEqual(self.event.clusterId, "j-1YONHTCP3YZKC")
+        self.assertEqual(self.event.stepId, "s-36ZWOFMZ19IUZ")
         self.assertEqual(self.event.state, "FAILED")
 
 
@@ -117,47 +118,5 @@ class TestUnsupportedEventTestCase(unittest.TestCase):
         }"""
 
     def test_event_filter_to_event_object_raises_unsupported_event_type(self):
-        json_object = json.loads(self.test_event)
         with self.assertRaises(UnsupportedEventType):
-            filter_event_from_kwargs(**json_object)
-
-
-class TestCloudwatchEventTriggerLocalstackTestCase(unittest.TestCase):
-
-    def setUp(self) -> None:
-        print('\r\nSetting up the class')
-        function_arn = testutils.create_lambda('wo_task_listener')
-        testutils.wait_for_function('wo_task_listener')
-
-        sns_topic_arn = testutils.create_sns_topic('task_listener_topic')
-        event_bus_arn = testutils.create_event_bus('test-bus')
-        rule_arn = testutils.put_event_rule(
-            name="ClusterWaiting",
-            event_pattern="""{"source": ["aws.emr"], "detail-type": ["EMR Cluster State Change"], "detail": { "state": ["WAITING", "STARTING"] }}""",
-            event_bus=event_bus_arn
-        )
-        time.sleep(5)
-        testutils.put_event_targets(
-            rule=rule_arn,
-            targets=[
-                {
-                    "Id": "ClusterChange",
-                    "Arn": sns_topic_arn
-                }
-            ],
-            event_bus=event_bus_arn
-        )
-        testutils.subscribe_lambda_to_sns(
-            sns_topic_arn,
-            function_arn
-        )
-        self.cluster_id = testutils.create_emr_cluster()
-
-    def test_this(self):
-        print(self.cluster_id)
-        time.sleep(5)
-
-    def tearDown(self):
-        testutils.delete_lambda('wo_task_listener')
-        testutils.delete_event_bus('test-bus')
-        testutils.terminate_emr_cluster(self.cluster_id)
+            filter_event_from_kwargs(**self.test_event)

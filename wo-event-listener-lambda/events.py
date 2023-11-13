@@ -60,6 +60,9 @@ class Event:
 	def to_json(self):
 		return json.dumps(self, cls=EventEncoder)
 
+	def group_id(self):
+		raise NotImplementedError
+
 
 @dataclass
 class EMRClusterEvent(Event):
@@ -68,6 +71,9 @@ class EMRClusterEvent(Event):
 	clusterId: str
 	state: str
 	message: str
+
+	def group_id(self):
+		return self.clusterId
 
 
 @dataclass
@@ -78,3 +84,6 @@ class EMRStepEvent(Event):
 	stepId: str
 	state: str
 	message: str
+
+	def group_id(self):
+		return self.stepId
