@@ -1,6 +1,4 @@
-import os
 import boto3
-import botocore
 
 def _get_resource(service: str):
     return boto3.client(service)

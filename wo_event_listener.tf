@@ -1,6 +1,6 @@
 resource "aws_iam_role" "workflow_orchestrator_event_listener" {
   name               = "wo_event_listener"
-  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
 resource "aws_iam_role_policy_attachment" "workflow_orchestrator_event_listener_lambda_logs" {
@@ -18,6 +18,11 @@ resource "aws_iam_role_policy_attachment" "workflow_orchestrator_event_listener_
   policy_arn = aws_iam_policy.lambda_vpc_deployment.arn
 }
 
+resource "aws_iam_role_policy_attachment" "workflow_orchestrator_event_listener_lambda_to_sns" {
+  role = aws_iam_role.workflow_orchestrator_event_listener.name
+  policy_arn = aws_iam_policy.lambda_to_sns.arn
+}
+
 data "archive_file" "workflow_orchestrator_event_listener_lambda" {
   type        = "zip"
   source_dir = "${path.module}/wo-event-listener-lambda/"
@@ -32,6 +37,15 @@ resource "aws_security_group" "workflow_orchestrator_event_listener" {
   description = "Workflow Orchestrator Event Listener Lambda Security Group."
   vpc_id      = data.terraform_remote_state.azkaban.outputs.workflow_manager_vpc.vpc.id
   tags        = merge(local.tags, { Name = local.name })
+}
+
+resource "aws_security_group_rule" "workflow_orchestration_event_listener_output" {
+  type              = "egress"
+  to_port           = 0
+  protocol          = "-1"
+  from_port         = 0
+  security_group_id = aws_security_group.workflow_orchestrator_event_listener.id
+  cidr_blocks       = ["0.0.0.0/0"] 
 }
 
 resource "aws_lambda_function" "workflow_orchestrator_event_listener_lambda" {
@@ -60,9 +74,4 @@ resource "aws_lambda_alias" "workflow_orchestration_event_listener_lambda_alias"
 
     function_name = aws_lambda_function.workflow_orchestrator_event_listener_lambda.function_name
     function_version = "$LATEST"
-}
-
-resource "aws_sns_topic" "workflow_orchestration_events_topic" {
-    name = "workflow_orchestration_task_events.fifo"
-    fifo_topic = true
 }

@@ -51,6 +51,7 @@ class EventEncoder(json.JSONEncoder):
 
 @dataclass
 class Event:
+	id: str
 	event_type: str
 	region: str
 	account: str
@@ -59,6 +60,9 @@ class Event:
 
 	def to_json(self):
 		return json.dumps(self, cls=EventEncoder)
+
+	def uid(self):
+		return self.id
 
 	def group_id(self):
 		raise NotImplementedError

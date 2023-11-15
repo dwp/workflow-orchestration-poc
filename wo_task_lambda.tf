@@ -1,6 +1,6 @@
 resource "aws_iam_role" "workflow_orchestrator_task_submitter" {
   name               = "wo_task_submitter"
-  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
 resource "aws_iam_role_policy_attachment" "workflow_orchestrator_task_submitter_lambda_logs" {

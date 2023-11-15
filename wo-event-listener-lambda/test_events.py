@@ -40,6 +40,7 @@ class TestEMRClusterEventTestCase(unittest.TestCase):
         self.assertIsNotNone(self.event.region)
         self.assertIsNotNone(self.event.resources)
         self.assertIsNotNone(self.event.time)
+        self.assertEqual(self.event.id, "8535abb0-f87e-4640-b7b6-8de000dfc30a")
         self.assertEqual(self.event.severity, "INFO")
         self.assertEqual(self.event.name, "Development Cluster")
         self.assertEqual(self.event.clusterId, "j-1YONHTCP3YZKC")
@@ -49,9 +50,14 @@ class TestEMRClusterEventTestCase(unittest.TestCase):
     def test_event_filter_is_event_type(self):
         self.assertIsInstance(self.event, EMRClusterEvent)
 
-
     def test_event_json_dumps(self):
         print(self.event.to_json())
+
+    def test_event_uid(self):
+        self.assertEqual(self.event.uid(), "8535abb0-f87e-4640-b7b6-8de000dfc30a")
+
+    def test_event_group_id(self):
+        self.assertEqual(self.event.group_id(), "j-1YONHTCP3YZKC")
 
 
 class TestEMRStepEventTestCase(unittest.TestCase):
@@ -84,6 +90,7 @@ class TestEMRStepEventTestCase(unittest.TestCase):
         self.assertIsNotNone(self.event.region)
         self.assertIsNotNone(self.event.resources)
         self.assertIsNotNone(self.event.time)
+        self.assertEqual(self.event.id, "6965277f-1f52-4564-9f7b-ae90b0ce2294")
         self.assertEqual(self.event.severity, "ERROR")
         self.assertEqual(self.event.name, "CustomJAR")
         self.assertEqual(self.event.clusterId, "j-1YONHTCP3YZKC")
@@ -93,6 +100,15 @@ class TestEMRStepEventTestCase(unittest.TestCase):
 
     def test_event_filter_is_event_type(self):
         self.assertIsInstance(self.event, EMRStepEvent)
+
+    def test_event_json_dumps(self):
+        print(self.event.to_json())
+
+    def test_event_group_id(self):
+        self.assertEqual(self.event.group_id(), "s-36ZWOFMZ19IUZ")
+
+    def test_event_uid(self):
+        self.assertEqual(self.event.uid(), "6965277f-1f52-4564-9f7b-ae90b0ce2294")
 
 
 class TestUnsupportedEventTestCase(unittest.TestCase):
@@ -119,4 +135,5 @@ class TestUnsupportedEventTestCase(unittest.TestCase):
 
     def test_event_filter_to_event_object_raises_unsupported_event_type(self):
         with self.assertRaises(UnsupportedEventType):
-            filter_event_from_kwargs(**self.test_event)
+            json_object = json.loads(self.test_event)
+            filter_event_from_kwargs(**json_object)
